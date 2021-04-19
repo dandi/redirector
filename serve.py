@@ -17,11 +17,11 @@ ABOUT_URL = os.environ.get("ABOUT_URL", "https://www.dandiarchive.org").rstrip("
 
 PUBLISH_API_URL = os.environ.get(
     "PUBLISH_API_URL", "https://publish.dandiarchive.org/api"
-).rstrip()
+).rstrip("/")
 
 JUPYTERHUB_URL = os.environ.get(
     "JUPYTERHUB_URL", "https://hub.dandiarchive.org"
-).rstrip()
+).rstrip("/")
 
 dandiset_identifier_regex = "^[0-9]{6}$"
 
