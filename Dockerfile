@@ -1,5 +1,4 @@
-# Sanic LTS (18.12) and Alpine
-FROM sanicframework/sanic:LTS
+FROM sanicframework/sanic:20.12
 
 WORKDIR /opt
 COPY . .
