@@ -12,8 +12,8 @@ NEXIST_DANDI_ID = "999999"
         ("/dandiset", "https://gui.dandiarchive.org/#/dandiset"),
         ("/dandiset/000003", "https://gui.dandiarchive.org/#/dandiset/000003/draft"),
         (
-            "/dandiset/000003/0.20200703.1040",
-            "https://gui.dandiarchive.org/#/dandiset/000003/0.20200703.1040",
+            "/dandiset/000003/draft",
+            "https://gui.dandiarchive.org/#/dandiset/000003/draft",
         ),
     ],
 )
@@ -28,8 +28,8 @@ def test_redirect(req_url, resp_url):
     [
         ("/dandiset/000003", "https://gui.dandiarchive.org/#/dandiset/000003/draft"),
         (
-            "/dandiset/000003/0.20200703.1040",
-            "https://gui.dandiarchive.org/#/dandiset/000003/0.20200703.1040",
+            "/dandiset/000003/draft",
+            "https://gui.dandiarchive.org/#/dandiset/000003/draft",
         ),
     ],
 )
