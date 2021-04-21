@@ -7,17 +7,13 @@ from sanic import response
 from sanic_cors import CORS
 import requests
 
-GIRDER_URL = os.environ.get("GIRDER_URL", "https://girder.dandiarchive.org").rstrip("/")
+API_URL = os.environ.get("GIRDER_URL", "https://api.dandiarchive.org/api").rstrip("/")
 
-GIRDER_LOCAL_URL = os.environ.get("GIRDER_LOCAL_URL", GIRDER_URL).rstrip("/")
+API_LOCAL_URL = os.environ.get("API_LOCAL_URL", API_URL).rstrip("/")
 
 GUI_URL = os.environ.get("GUI_URL", "https://gui.dandiarchive.org").rstrip("/")
 
 ABOUT_URL = os.environ.get("ABOUT_URL", "https://www.dandiarchive.org").rstrip("/")
-
-PUBLISH_API_URL = os.environ.get(
-    "PUBLISH_API_URL", "https://publish.dandiarchive.org/api"
-).rstrip("/")
 
 JUPYTERHUB_URL = os.environ.get(
     "JUPYTERHUB_URL", "https://hub.dandiarchive.org"
@@ -136,7 +132,7 @@ async def goto_dandiset(request, dataset):
     """
     if not re.fullmatch(dandiset_identifier_regex, dataset):
         return response.text(f"{dataset}: invalid Dandiset ID", status=400)
-    req = requests.get(f"{GIRDER_LOCAL_URL}/api/v1/dandi/{dataset}")
+    req = requests.get(f"{API_LOCAL_URL}/dandisets/{dataset}")
     if req.reason == "OK":
         url = f"{GUI_URL}/#/dandiset/{dataset}/draft"
         if request.method == "HEAD":
@@ -151,13 +147,13 @@ async def goto_dandiset_version(request, dataset, version):
     """
     if not re.fullmatch(dandiset_identifier_regex, dataset):
         return response.text(f"{dataset}: invalid Dandiset ID", status=400)
-    req = requests.get(f"{GIRDER_LOCAL_URL}/api/v1/dandi/{dataset}")
+    req = requests.get(f"{API_LOCAL_URL}/dandisets/{dataset}/versions/{version}")
     if req.reason == "OK":
         url = f"{GUI_URL}/#/dandiset/{dataset}/{version}"
         if request.method == "HEAD":
             return response.html(None, status=302, headers=make_header(url))
         return response.redirect(url)
-    return response.text(f"dandi:{dataset} not found.", status=404)
+    return response.text(f"dandi:{dataset}/{version} not found.", status=404)
 
 
 @app.route("/server-info", methods=["GET"])
@@ -168,9 +164,8 @@ async def server_info(request):
             "cli-minimal-version": "0.14.1",
             "cli-bad-versions": [],
             "services": {
-                "girder": {"url": GIRDER_URL},
+                "api": {"url": API_LOCAL_URL},
                 "webui": {"url": GUI_URL},
-                "api": {"url": None},  # Currently we use girder, not dandi-api
                 "jupyterhub": {"url": JUPYTERHUB_URL},
             },
         },
