@@ -76,6 +76,7 @@ def test_server_info():
         "cli-minimal-version": "0.14.1",
         "cli-bad-versions": [],
         "services": {
+            "girder": {"url": None},
             "api": {"url": "https://api.dandiarchive.org/api"},
             "webui": {"url": "https://gui.dandiarchive.org"},
             "jupyterhub": {"url": "https://hub.dandiarchive.org"},

@@ -7,7 +7,7 @@ from sanic import response
 from sanic_cors import CORS
 import requests
 
-API_URL = os.environ.get("GIRDER_URL", "https://api.dandiarchive.org/api").rstrip("/")
+API_URL = os.environ.get("API_URL", "https://api.dandiarchive.org/api").rstrip("/")
 
 API_LOCAL_URL = os.environ.get("API_LOCAL_URL", API_URL).rstrip("/")
 
@@ -164,6 +164,7 @@ async def server_info(request):
             "cli-minimal-version": "0.14.1",
             "cli-bad-versions": [],
             "services": {
+                "girder": {"url": None},
                 "api": {"url": API_LOCAL_URL},
                 "webui": {"url": GUI_URL},
                 "jupyterhub": {"url": JUPYTERHUB_URL},
