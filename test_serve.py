@@ -50,7 +50,7 @@ def test_redirect_nonexistent_dandiset():
 def test_redirect_nonexistent_dandiset_version():
     _, r = app.test_client.get(f"/dandiset/{NEXIST_DANDI_ID}/0.20200703.1040")
     assert r.status_code == 404
-    assert r.text == f"dandi:{NEXIST_DANDI_ID} not found."
+    assert r.text == f"dandi:{NEXIST_DANDI_ID}/0.20200703.1040 not found."
 
 
 @pytest.mark.parametrize(
