@@ -12,8 +12,8 @@ NEXIST_DANDI_ID = "999999"
         ("/dandiset", "https://gui.dandiarchive.org/#/dandiset"),
         ("/dandiset/000003", "https://gui.dandiarchive.org/#/dandiset/000003/draft"),
         (
-            "/dandiset/000003/0.20200703.1040",
-            "https://gui.dandiarchive.org/#/dandiset/000003/0.20200703.1040",
+            "/dandiset/000003/draft",
+            "https://gui.dandiarchive.org/#/dandiset/000003/draft",
         ),
     ],
 )
@@ -28,8 +28,8 @@ def test_redirect(req_url, resp_url):
     [
         ("/dandiset/000003", "https://gui.dandiarchive.org/#/dandiset/000003/draft"),
         (
-            "/dandiset/000003/0.20200703.1040",
-            "https://gui.dandiarchive.org/#/dandiset/000003/0.20200703.1040",
+            "/dandiset/000003/draft",
+            "https://gui.dandiarchive.org/#/dandiset/000003/draft",
         ),
     ],
 )
@@ -50,7 +50,7 @@ def test_redirect_nonexistent_dandiset():
 def test_redirect_nonexistent_dandiset_version():
     _, r = app.test_client.get(f"/dandiset/{NEXIST_DANDI_ID}/0.20200703.1040")
     assert r.status_code == 404
-    assert r.text == f"dandi:{NEXIST_DANDI_ID} not found."
+    assert r.text == f"dandi:{NEXIST_DANDI_ID}/0.20200703.1040 not found."
 
 
 @pytest.mark.parametrize(
@@ -76,9 +76,9 @@ def test_server_info():
         "cli-minimal-version": "0.14.1",
         "cli-bad-versions": [],
         "services": {
-            "girder": {"url": "https://girder.dandiarchive.org"},
+            "girder": {"url": None},
+            "api": {"url": "https://api.dandiarchive.org/api"},
             "webui": {"url": "https://gui.dandiarchive.org"},
-            "api": {"url": None},
             "jupyterhub": {"url": "https://hub.dandiarchive.org"},
         },
     }
