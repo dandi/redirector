@@ -32,7 +32,7 @@ handler_dict = {
     "class": "logging.handlers.TimedRotatingFileHandler",
     "when": "D",
     "interval": 7,
-    "backupCount": 10,
+    "backupCount": 140,
     "formatter": "generic",
 }
 LOG_SETTINGS = dict(
@@ -64,7 +64,7 @@ LOG_SETTINGS = dict(
         },
         "access_consolefile": {
             **handler_dict,
-            **{"filename": os.path.join(logdir, "access.log")},
+            **{"filename": os.path.join(logdir, "access.log"), "formatter": "access"},
         },
     },
     formatters={
