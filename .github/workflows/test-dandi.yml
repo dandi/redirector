@@ -32,4 +32,5 @@ jobs:
         python util/rewrite-dandi-docker.py
     - name: Run tests
       run: |
-        python -m pytest -s -v -k test_parse_dandi --pyargs dandi
+        export DANDI_REDIRECTOR_BASE=http://localhost:8079
+        python -m pytest -s -v -m redirector --pyargs dandi
