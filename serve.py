@@ -7,7 +7,8 @@ from sanic import response
 from sanic_cors import CORS
 from sanic.response import HTTPResponse
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 API_URL = os.environ.get("API_URL", "https://api.dandiarchive.org/api").rstrip("/")
 
@@ -189,6 +190,11 @@ async def _fetch(url):
 
 
 async def _sitemap():
+    sitemapfile = Path("sitemap.xml")
+    if sitemapfile.exists():
+        modified = datetime.fromtimestamp(sitemapfile.stat().st_mtime, tz=timezone.utc)
+        if (datetime.now(tz=timezone.utc) - modified) < timedelta(days=1):
+            return sitemapfile.read_text()
     sitemap = [
         """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">"""
@@ -208,7 +214,9 @@ async def _sitemap():
                 f"""<url><loc>{url}</loc><lastmod>{version['modified']}</lastmod></url>"""
             )
     sitemap.append("</urlset>")
-    return "\n".join(sitemap)
+    sitemap = "\n".join(sitemap)
+    sitemapfile.write_text(sitemap)
+    return sitemap
 
 
 @app.route("sitemap.xml", methods=["GET"])
