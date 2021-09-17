@@ -5,7 +5,10 @@ from sanic import Sanic
 from sanic.log import logger
 from sanic import response
 from sanic_cors import CORS
+from sanic.response import HTTPResponse
 import requests
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 API_URL = os.environ.get("API_URL", "https://api.dandiarchive.org/api").rstrip("/")
 
@@ -171,6 +174,54 @@ async def server_info(request):
             },
         },
         indent=4,
+    )
+
+
+async def _fetch(url):
+    querystring = {"page_size": "100"}
+    headers = {"Accept": "application/json", "Content-Type": "application/json"}
+    resp = requests.request("GET", url, headers=headers, params=querystring).json()
+    results = resp["results"]
+    while resp["next"]:
+        resp = requests.request("GET", resp["next"], headers=headers).json()
+        results.extend(resp["results"])
+    return results
+
+
+async def _sitemap():
+    sitemapfile = Path("sitemap.xml")
+    if sitemapfile.exists():
+        modified = datetime.fromtimestamp(sitemapfile.stat().st_mtime, tz=timezone.utc)
+        if (datetime.now(tz=timezone.utc) - modified) < timedelta(days=1):
+            return sitemapfile.read_text()
+    sitemap = [
+        """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">"""
+    ]
+
+    for ds in await _fetch("https://api.dandiarchive.org/api/dandisets"):
+        versions = await _fetch(
+            f"https://api.dandiarchive.org/api/dandisets/"
+            f"{ds['identifier']}/versions"
+        )
+        for version in versions:
+            url = (
+                f"https://dandiarchive.org/dandiset/{ds['identifier']}/"
+                f"{version['version']}"
+            )
+            sitemap.append(
+                f"""<url><loc>{url}</loc><lastmod>{version['modified']}</lastmod></url>"""
+            )
+    sitemap.append("</urlset>")
+    sitemap = "\n".join(sitemap)
+    sitemapfile.write_text(sitemap)
+    return sitemap
+
+
+@app.route("sitemap.xml", methods=["GET"])
+async def sitemap(request):
+    return HTTPResponse(
+        await _sitemap(), status=200, headers=None, content_type="text/xml"
     )
 
 
