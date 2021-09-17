@@ -7,7 +7,6 @@ from sanic import response
 from sanic_cors import CORS
 from sanic.response import HTTPResponse
 import requests
-from sanic_mako import render_string
 from datetime import datetime, timedelta
 
 API_URL = os.environ.get("API_URL", "https://api.dandiarchive.org/api").rstrip("/")
@@ -191,7 +190,10 @@ async def _fetch(url):
 
 async def _sitemap(request):
     one_day_ago = (datetime.now() - timedelta(days=1)).date().isoformat()
-    items = []
+    sitemap = [
+        """<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">"""
+    ]
 
     for ds in await _fetch("https://api.dandiarchive.org/api/dandisets"):
         versions = await _fetch(
@@ -203,9 +205,11 @@ async def _sitemap(request):
                 f"https://dandiarchive.org/dandiset/{ds['identifier']}/"
                 f"{version['version']}"
             )
-            items.append([url, one_day_ago])
-
-    return await render_string("sitemap.xml", request, {"items": items})
+            sitemap.append(
+                f"""<sitemap><loc>{url}</loc><lastmod>{one_day_ago}</lastmod></sitemap>"""
+            )
+    sitemap.append("</sitemapindex>")
+    return "\n".join(sitemap)
 
 
 @app.route("sitemap.xml", methods=["GET"])
