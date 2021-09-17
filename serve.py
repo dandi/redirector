@@ -188,11 +188,10 @@ async def _fetch(url):
     return results
 
 
-async def _sitemap(request):
-    one_day_ago = (datetime.now() - timedelta(days=1)).date().isoformat()
+async def _sitemap():
     sitemap = [
         """<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">"""
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">"""
     ]
 
     for ds in await _fetch("https://api.dandiarchive.org/api/dandisets"):
@@ -206,16 +205,16 @@ async def _sitemap(request):
                 f"{version['version']}"
             )
             sitemap.append(
-                f"""<sitemap><loc>{url}</loc><lastmod>{one_day_ago}</lastmod></sitemap>"""
+                f"""<url><loc>{url}</loc><lastmod>{version['modified']}</lastmod></url>"""
             )
-    sitemap.append("</sitemapindex>")
+    sitemap.append("</urlset>")
     return "\n".join(sitemap)
 
 
 @app.route("sitemap.xml", methods=["GET"])
 async def sitemap(request):
     return HTTPResponse(
-        await _sitemap(request), status=200, headers=None, content_type="text/xml"
+        await _sitemap(), status=200, headers=None, content_type="text/xml"
     )
 
 
