@@ -185,7 +185,6 @@ async def _fetch(url):
     while resp["next"]:
         resp = requests.request("GET", resp["next"], headers=headers).json()
         results.extend(resp["results"])
-    assert len(results) == resp["count"]
     return results
 
 
