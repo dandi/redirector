@@ -1,3 +1,5 @@
+**This service is no longer used and the project is archived**
+
 # redirector
 
 ## Current install process on instance
